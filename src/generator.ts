@@ -235,7 +235,11 @@ export class RoughGenerator {
     return this._d('path', paths, o);
   }
 
-  opsToPath(drawing: OpSet, fixedDecimals?: number): string[] {
+  opsToPath({ drawing, fixedDecimals, animate }: { drawing: OpSet; fixedDecimals?: number; animate?: boolean; }): string[] {
+    return animate ? this.opsToPathAnimated(drawing, fixedDecimals) : this.opsToPathStatic(drawing, fixedDecimals);
+  }
+
+  private opsToPathAnimated(drawing: OpSet, fixedDecimals?: number): string[] {
     const paths: string[] = [];
     let path = '';
     for (const item of drawing.ops) {
@@ -261,6 +265,25 @@ export class RoughGenerator {
     return paths;
   }
 
+  private opsToPathStatic(drawing: OpSet, fixedDecimals?: number): string[] {
+    let path = '';
+    for (const item of drawing.ops) {
+      const data = ((typeof fixedDecimals === 'number') && fixedDecimals >= 0) ? (item.data.map((d) => +d.toFixed(fixedDecimals))) : item.data;
+      switch (item.op) {
+        case 'move':
+          path += `M${data[0]} ${data[1]} `;
+          break;
+        case 'bcurveTo':
+          path += `C${data[0]} ${data[1]}, ${data[2]} ${data[3]}, ${data[4]} ${data[5]} `;
+          break;
+        case 'lineTo':
+          path += `L${data[0]} ${data[1]} `;
+          break;
+      }
+    }
+    return [path.trim()];
+  }
+
   toPaths(drawable: Drawable): PathInfo[] {
     const sets = drawable.sets || [];
     const o = drawable.options || this.defaultOptions;
@@ -268,7 +291,7 @@ export class RoughGenerator {
     for (const drawing of sets) {
       switch (drawing.type) {
         case 'path':
-          this.opsToPath(drawing).forEach((p) => paths.push({
+          this.opsToPath({ drawing, animate: o.animate }).forEach((p) => paths.push({
             d: p,
             stroke: o.stroke,
             strokeWidth: o.strokeWidth,
@@ -277,7 +300,7 @@ export class RoughGenerator {
 
           break;
         case 'fillPath':
-          this.opsToPath(drawing).forEach((fp) => paths.push({
+          this.opsToPath({ drawing, animate: o.animate }).forEach((fp) => paths.push({
             d: fp,
             stroke: NOS,
             strokeWidth: 0,
@@ -299,7 +322,7 @@ export class RoughGenerator {
       fweight = o.strokeWidth / 2;
     }
 
-    return this.opsToPath(drawing).map((fp) => ({
+    return this.opsToPath({ drawing, animate: o.animate }).map((fp) => ({
       d: fp,
       stroke: o.fill || NOS,
       strokeWidth: fweight,

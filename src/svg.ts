@@ -22,7 +22,7 @@ export class RoughSVG {
 
       switch (drawing.type) {
         case 'path': {
-          const myPaths = this.opsToPath(drawing, precision);
+          const myPaths = this.opsToPath(drawing, precision, o.animate);
           for (const myPath of myPaths) {
             const pathEl = doc.createElementNS(SVGNS, 'path');
             pathEl.setAttribute('d', myPath);
@@ -49,7 +49,7 @@ export class RoughSVG {
           break;
         }
         case 'fillPath': {
-          const myFillPaths = this.opsToPath(drawing, precision);
+          const myFillPaths = this.opsToPath(drawing, precision, o.animate);
           for (const myFillPath of myFillPaths) {
 
             const pathEl = doc.createElementNS(SVGNS, 'path');
@@ -83,7 +83,7 @@ export class RoughSVG {
       fweight = o.strokeWidth / 2;
     }
 
-    const fillSketchPaths = this.opsToPath(drawing, o.fixedDecimalPlaceDigits);
+    const fillSketchPaths = this.opsToPath(drawing, o.fixedDecimalPlaceDigits, o.animate);
 
     let returnPaths: SVGPathElement[] = [];
 
@@ -158,8 +158,8 @@ export class RoughSVG {
     return this.gen.defaultOptions;
   }
 
-  opsToPath(drawing: OpSet, fixedDecimalPlaceDigits?: number): string[] {
-    return this.gen.opsToPath(drawing, fixedDecimalPlaceDigits);
+  opsToPath(drawing: OpSet, fixedDecimalPlaceDigits?: number, animate?: boolean): string[] {
+    return this.gen.opsToPath({ drawing, fixedDecimals: fixedDecimalPlaceDigits, animate });
   }
 
   line(x1: number, y1: number, x2: number, y2: number, options?: Options): SVGGElement {
