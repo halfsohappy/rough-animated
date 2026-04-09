@@ -72,6 +72,7 @@ export function RoughToggle({
 
   return (
     <label
+      onClick={() => onChange(!checked)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -83,7 +84,6 @@ export function RoughToggle({
       }}
     >
       <span
-        onClick={() => onChange(!checked)}
         style={{ display: 'inline-flex', lineHeight: 0 }}
       >
         <svg ref={svgRef} />

@@ -67,6 +67,7 @@ export function RoughRadio({
 
   return (
     <label
+      onClick={() => onChange(!checked)}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
@@ -78,7 +79,6 @@ export function RoughRadio({
       }}
     >
       <span
-        onClick={() => onChange(!checked)}
         style={{ display: 'inline-flex', lineHeight: 0 }}
       >
         <svg ref={svgRef} />
